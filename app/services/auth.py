@@ -8,7 +8,7 @@ from app.schemas.user_mgt import AuthUser
 import logging
 from sqlalchemy.orm import joinedload
 from app.schemas.user_mgt import UserRegister
-
+import uuid
 
 class AuthService:
     def __init__(self) -> None:
@@ -34,13 +34,13 @@ class AuthService:
 
         expire = datetime.utcnow() + timedelta(minutes=JWT_TOKEN_EXPIRE_IN_MIN)
         encode = {
-            "id": user.id,
+            "id": str(user.id),
             "full_name": user.full_name,
             "exp": expire
         }
         return jwt.encode(encode, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
-    def get_user_details(self, user_id: int) -> AuthUser:
+    def get_user_details(self, user_id: uuid.UUID) -> AuthUser:
         try:
             # Panggil find_by_id tanpa .options(joinedload(User.roles))
             user = self.auth_repo.find_by_id(user_id)
@@ -55,9 +55,9 @@ class AuthService:
                 email=user.email,
                 created_at=user.created_at,
                 updated_at=user.updated_at,
-                deleted_at=user.deleted_at,
+                dseleted_at=user.deleted_at,
                 created_by=user.created_by,
-                # roles=[role.name for role in user.roles]  # Dapatkan nama roles
+                # roles=[role.name for role in user.roles]  # Dapatkan nama role
             )
             logging.info(f"User details: {user_data}")
             return user_data

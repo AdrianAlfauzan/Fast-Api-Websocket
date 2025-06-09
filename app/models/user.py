@@ -3,11 +3,11 @@ from .base import Base
 from sqlalchemy import UUID, ForeignKey, Column, Integer, String, DateTime, func
 from sqlalchemy.orm import relationship
 from app.core.constants.app import DEFAULT_TZ
-
+import uuid
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     # company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
     full_name = Column(String, nullable=False)
     username = Column(String, unique=True, index=True, nullable=False)

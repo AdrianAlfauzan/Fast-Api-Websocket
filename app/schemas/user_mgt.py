@@ -50,7 +50,7 @@ class PasswordUpdate(BaseModel):
 
 
 class AuthUser(BaseModel):
-    id: int
+    id: str
     company_id: str
     full_name: str
     username: str

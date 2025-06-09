@@ -2,7 +2,7 @@ from typing import List
 from passlib.context import CryptContext
 from sqlalchemy.orm import Query, joinedload
 from sqlalchemy import or_
-
+import uuid
 from app.core.database import get_session
 from app.models.user import User
 # from app.models.role import Role, user_role_association
@@ -24,8 +24,7 @@ class AuthRepository:
             db.refresh(user)
             return user
 
-        
-    def find_by_id(self, id: int) -> User | None:
+    def find_by_id(self, id: uuid.UUID) -> User | None:
         """Menemukan pengguna berdasarkan ID unik mereka, dengan eager loading pada `roles`."""
         with get_session() as db:
             return (
@@ -76,7 +75,7 @@ class AuthRepository:
         """
         return bcrypt_context.verify(plain_password, hashed_password)
 
-    def find_by_id_with_roles(self, id: int) -> User | None:
+    def find_by_id_with_roles(self, id: uuid.UUID) -> User | None:
         """Menemukan pengguna berdasarkan ID bersamaan dengan peran terkait.
         
         Args:
@@ -97,7 +96,7 @@ class AuthRepository:
                 .one_or_none()
             )
 
-    def has_role(self, id: int, role_name: str) -> bool:
+    def has_role(self, id: uuid.UUID, role_name: str) -> bool:
         """Memeriksa apakah pengguna memiliki peran tertentu.
         
         Args:
@@ -116,7 +115,7 @@ class AuthRepository:
             return False
         return any(role.name == role_name for role in user.roles)
 
-    def is_username_or_email_used(self, username: str, email: str, except_id: int = 0) -> bool:
+    def is_username_or_email_used(self, username: str, email: str, except_id: uuid.UUID = None) -> bool:
         """Memeriksa apakah username atau email sudah digunakan, dengan pengecualian pada ID tertentu.
         
         Args:

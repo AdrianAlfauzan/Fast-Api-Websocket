@@ -72,14 +72,16 @@ async def list_conversations(
     chat_list = await get_conversations_for_user(session, uuid.UUID(current_user_id))
     return chat_list
     
+
 @router.get("/conversations/{conversation_id}/messages", response_model=list[ChatMessage])
-async def list_messages(conversation_id: str):
-    async with get_session() as session:
-        messages = await get_messages_for_conversation(session, uuid.UUID(conversation_id))
-        return messages
+async def list_messages(
+    conversation_id: str,
+    session: AsyncSession = Depends(get_async_session)
+):
+    messages = await get_messages_for_conversation(session, uuid.UUID(conversation_id))
+    return messages
 
 
-# chat message endpoints 
 @router.put("/messages/{message_id}", response_model=ChatMessage)
 async def update_message_endpoint(message_id: str, body: ChatMessageUpdate):
     async with get_session() as session:
