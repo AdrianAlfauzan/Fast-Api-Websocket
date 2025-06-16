@@ -2,6 +2,9 @@
 
 from fastapi import APIRouter
 from app.api.v1.chat.manage_chat import router as manage_chat_router
+from app.api.v1.chat.manage_chat_rooms import router as manage_chat_room_router
+
 
 router = APIRouter(tags=["Chat Management"])
 router.include_router(manage_chat_router)
+router.include_router(manage_chat_room_router)

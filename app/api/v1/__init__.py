@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from app.api.v1.auth import router as auth_router
 from app.api.v1.chat import router as chat_router
+from app.api.v1.chat import router as chat_rooms_router
+from app.api.v1.call import router as call_router
 # from app.api.v1.user_mgt import router as user_router
 # from app.api.v1.position_mgt import router as position_router
 # from app.api.v1.company_mgt import router as company_router
@@ -19,6 +21,8 @@ from app.api.v1.chat import router as chat_router
 router = APIRouter(prefix="/v1")
 router.include_router(auth_router)
 router.include_router(chat_router)
+router.include_router(chat_rooms_router)
+router.include_router(call_router)
 # router.include_router(user_router)
 # router.include_router(position_router)
 # router.include_router(company_router)

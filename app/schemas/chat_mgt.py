@@ -6,6 +6,7 @@ class ChatMessage(BaseModel):
     id: str
     sender_id: str
     content: str
+    chat_room_id: Optional[str] = None
     message_type: str
     seen: bool
     sent_at: Optional[str]

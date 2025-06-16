@@ -6,7 +6,7 @@ from app.models.user import User
 from app.models.conversation import Conversation
 from app.models.conversation_user import ConversationUser  
 from app.models.message import Message
-
+from datetime import datetime
 async def create_conversation_by_username(
     session: AsyncSession,
     current_user_id: uuid.UUID,
@@ -108,6 +108,7 @@ async def update_message(session, message_id, content):
     if not msg:
         return None
     msg.content = content
+    msg.updated_at = datetime.utcnow()
     await session.commit()
     await session.refresh(msg)
     return {
@@ -118,6 +119,7 @@ async def update_message(session, message_id, content):
         "seen": msg.seen,
         "sent_at": msg.sent_at.isoformat() if msg.sent_at else None,
         "created_at": msg.created_at.isoformat() if msg.created_at else None,
+        "updated_at": msg.updated_at.isoformat() if msg.updated_at else None,
     }
 
 async def delete_message(session, message_id):

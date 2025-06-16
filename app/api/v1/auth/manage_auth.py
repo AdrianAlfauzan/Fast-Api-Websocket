@@ -11,6 +11,7 @@ from app.core.config import settings
 from jose import jwt 
 from pytz import timezone
 from datetime import datetime, timedelta
+from fastapi.responses import JSONResponse
 
 router = APIRouter()
 auth_service = AuthService()
@@ -21,14 +22,23 @@ def register(body: UserRegister):
 
 @router.post("/auth/login")
 def auth_get_access_token(
-    username: str = Form(...),  # Menggunakan 'username' agar sesuai dengan standar OAuth2
+    username: str = Form(...),
     password: str = Form(...)
 ):
     access_token = auth_service.generate_token(username, password)
     if not access_token:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    return {"access_token": access_token, "type": "Bearer"}
+    response = JSONResponse(content={"message": "Login successful"})
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        max_age=60*60*24,  
+        samesite="lax",    
+        secure=False      
+    )
+    return response
 
 @router.get("/auth/me")
 def auth_get_me(auth_user: Annotated[AuthUser, Depends(jwt_middleware)]):
@@ -62,7 +72,7 @@ def generate_api_token  (auth_user: AuthUser = Depends(jwt_middleware)):
             "username": auth_user.username,
             "email": auth_user.email,
             "roles": auth_user.roles,
-            "company_name": getattr(auth_user, "company_name", "Unknown Company"),
+            # "company_name": getattr(auth_user, "company_name", "Unknown Company"),
             "exp": int(expire.timestamp()),  # Expiration as Unix timestamp
             "expires": expire.isoformat()    # ISO format for human-readable expiration
         }
