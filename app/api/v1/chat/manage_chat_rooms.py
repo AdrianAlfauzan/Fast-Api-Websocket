@@ -6,8 +6,8 @@ from app.repositories.chat_room import (
     send_chat_room_message,
 )
 from app.schemas.chat_mgt import ChatMessage
-from app.models.chat_room import ChatRoom
-from app.models.chat_room_user import ChatRoomUser
+from app.schemas.chat_room_mgt import ChatRoomCreate, ChatRoomResponse
+
 import uuid
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,7 +18,26 @@ router = APIRouter()
 manager = ConnectionManager()
 
 
-@router.post("/chat_rooms/create")
+@router.post("/chat_rooms/create", response_model=ChatRoomResponse)
+async def create_room(
+    chat_room: ChatRoomCreate,
+    session: AsyncSession = Depends(get_async_session)
+):
+    room = await create_chat_room(
+        session,
+        chat_room.name,
+        uuid.UUID(chat_room.created_by),
+        chat_room.description
+    )
+    return ChatRoomResponse(
+        chat_room_id=str(room.id),
+        name=room.name,
+        description=room.description,
+        is_group=room.is_group,
+        created_by=str(room.created_by),
+        created_at=room.created_at
+    )
+
 async def create_room(
     name: str,
     created_by: str,
